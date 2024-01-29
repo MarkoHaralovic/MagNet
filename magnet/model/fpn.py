@@ -6,20 +6,33 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .resnet import resnet50
+from .resnet import resnet18
 
 
 class ResnetFPN(nn.Module):
     def __init__(self, n_labels):
         super(ResnetFPN, self).__init__()
-        self.resnet_backbone = resnet50(True)
+        #self.resnet_backbone = resnet50(True) #resnet50
+        self.resnet_backbone= resnet18(True)
         self._up_kwargs = {"mode": "bilinear", "align_corners": False}
+        
         # Top layer
-        self.toplayer = nn.Conv2d(2048, 256, kernel_size=1, stride=1, padding=0)  # Reduce channels
+        #self.toplayer = nn.Conv2d(2048, 256, kernel_size=1, stride=1, padding=0)  # Reduce channels #resnet50
+        self.toplayer = nn.Conv2d(512, 256, kernel_size=1, stride=1, padding=0)  # Reduce channels        
+        
+        # Lateral layers for #resnet50
+        #self.latlayer1 = nn.Conv2d(1024, 256, kernel_size=1, stride=1, padding=0)
+        #self.latlayer2 = nn.Conv2d(512, 256, kernel_size=1, stride=1, padding=0)
+        #self.latlayer3 = nn.Conv2d(256, 256, kernel_size=1, stride=1, padding=0)
+        
+        # Lateral layers for #resnet18
         # Lateral layers
-        self.latlayer1 = nn.Conv2d(1024, 256, kernel_size=1, stride=1, padding=0)
-        self.latlayer2 = nn.Conv2d(512, 256, kernel_size=1, stride=1, padding=0)
-        self.latlayer3 = nn.Conv2d(256, 256, kernel_size=1, stride=1, padding=0)
-        # Smooth layers
+        self.latlayer1 = nn.Conv2d(256, 256, kernel_size=1, stride=1, padding=0)  # From layer3 of ResNet-18
+        self.latlayer2 = nn.Conv2d(128, 256, kernel_size=1, stride=1, padding=0)  # From layer2 of ResNet-18
+        self.latlayer3 = nn.Conv2d(64, 256, kernel_size=1, stride=1, padding=0)   # From layer1 of ResNet-18
+
+        
+        # Smooth layers #resnet50
         self.smooth1_1 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
         self.smooth2_1 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
         self.smooth3_1 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1)
@@ -28,6 +41,8 @@ class ResnetFPN(nn.Module):
         self.smooth2_2 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
         self.smooth3_2 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
         self.smooth4_2 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
+        
+        
         # Classify layers
         self.classify = nn.Conv2d(128 * 4, n_labels, kernel_size=3, stride=1, padding=1)
 
