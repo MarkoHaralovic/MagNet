@@ -1,0 +1,1 @@
+Using hrnet_w18_v2_imagenet.pth, which reports 3rd best accuracy on Deep Globe Land Cover Classification Challenge
