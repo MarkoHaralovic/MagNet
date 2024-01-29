@@ -2,9 +2,10 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 
 from .base import Bottleneck
+from .base import BasicBlock
 
 
-__all__ = ["ResNet", "resnet50", "resnet101"]
+__all__ = ["ResNet", "resnet18", "resnet50", "resnet101"]
 
 
 model_urls = {
@@ -28,7 +29,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-
+        
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
@@ -66,6 +67,16 @@ class ResNet(nn.Module):
 
         return c2, c3, c4, c5
 
+    
+def resnet18(pretrained=False,**kwargs):
+    """Constructs a Resnet-18 model.
+    Args:
+        pretrained (bool): If true, returns a model pre-trained on ImageNet
+    """
+    model = ResNet(BasicBlock, [2,2,2,2])
+    if pretrained:
+        model.load_state_dict(model_zoo.load_url(model_urls["resnet18"]),strict=False)
+    return model   
 
 def resnet50(pretrained=False, **kwargs):
     """Constructs a ResNet-50 model.
