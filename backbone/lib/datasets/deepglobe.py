@@ -15,6 +15,7 @@ from torch.nn import functional as F
 
 from .base_dataset import BaseDataset
 
+from tqdm import tqdm
 
 class DeepGlobe(BaseDataset):
     def __init__(
@@ -31,6 +32,7 @@ class DeepGlobe(BaseDataset):
         resize=(128, 256),
         downsample_rate=1,
         scale_factor=16,
+        ifw=False,
         mean=[0.485, 0.456, 0.406],
         std=[0.229, 0.224, 0.225],
     ):
@@ -69,8 +71,31 @@ class DeepGlobe(BaseDataset):
             5: [0, 0, 255],
             6: [255, 255, 255],
         }
-        self.class_weights = torch.FloatTensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]).cuda()
+        
         self.multi_crops = [(612, 612), (1224, 1224), (2448, 2448)]
+        
+        if not ifw:
+            self.class_weights = torch.FloatTensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]).cuda()
+        elif ifw:
+            self.class_weights = self.inverse_frequency_weighting(alpha=0.5)
+            
+        
+    def inverse_frequency_weighting(self, alpha = 0.5):
+        labels_count = {str(cls): 0 for cls in range(self.num_classes)}
+        total_pixels = 0
+        for i in tqdm(range(len(self.files)), desc="Updating weights of classes"):
+            _, label,_,_ = self.__getitem__(i)
+            classes,frequencies = np.unique(label, return_counts=True)
+            for cls,freq in zip(classes, frequencies):
+                labels_count[str(cls)]+=freq
+                total_pixels +=freq
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'         
+        class_weights = torch.zeros(7, dtype=torch.float32, device=device)
+        for index,cls in enumerate(labels_count):
+            cls_weight = (total_pixels / labels_count[cls] )*alpha
+            class_weights[index] = cls_weight
+            
+        return class_weights    
 
     def read_files(self):
         files = []
