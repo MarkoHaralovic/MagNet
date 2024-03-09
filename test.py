@@ -113,9 +113,8 @@ def main():
     median_blur.eval()
 
     # Confusion matrix
-    conf_mat = np.zeros((opt.num_classes, opt.num_classes), dtype=float)
-    refined_conf_mat = np.zeros((opt.num_classes, opt.num_classes), dtype=float)
-
+    conf_mat = np.zeros((opt.num_classes, opt.num_classes), dtype=np.float64)
+    refined_conf_mat = np.zeros((opt.num_classes, opt.num_classes), dtype=np.float64)
 
     # Test dataloader
     pbar = tqdm(total=len(dataset), ascii=True)
