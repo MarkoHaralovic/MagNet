@@ -9,6 +9,7 @@ python demo.py --dataset deepglobe \
 --num_classes 7 \
 --n_points 0.75 \
 --n_patches -1 \
+--sub_batch_size 1 \
 --smooth_kernel 11 \
 --save_pred \
 --save_dir test_results/demo
