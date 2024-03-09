@@ -33,7 +33,7 @@ TRAIN:
   SHUFFLE: true
   BEGIN_EPOCH: 0
   END_EPOCH: 484
-  RESUME: true
+  RESUME: false #true
   OPTIMIZER: sgd
   LR: 0.001
   WD: 0.0005
@@ -52,6 +52,6 @@ TEST:
   - 612
   - 612
   BASE_SIZE: 508
-  BATCH_SIZE_PER_GPU: 16
+  BATCH_SIZE_PER_GPU: 8
   FLIP_TEST: false
   MULTI_SCALE: false

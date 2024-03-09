@@ -117,7 +117,7 @@ def main():
         crop_size=crop_size,
         resize=(config.TRAIN.RESIZE[1], config.TRAIN.RESIZE[0]),
         downsample_rate=config.TRAIN.DOWNSAMPLERATE,
-        scale_factor=config.TRAIN.SCALE_FACTOR,
+        scale_factor=config.TRAIN.SCALE_FACTOR
     )
 
     train_sampler = get_sampler(train_dataset)
@@ -190,14 +190,29 @@ def main():
 
     # criterion
     if config.LOSS.USE_OHEM:
+        print("Using OHEM Cross Entropy Loss and using IFW with alpha=0.25")
+        class_weights = train_dataset.inverse_frequency_weighting(alpha = 0.25)
+        
+        criterion = OhemCrossEntropy(
+            ignore_label=config.TRAIN.IGNORE_LABEL,
+            thres=config.LOSS.OHEMTHRES,
+            min_kept=config.LOSS.OHEMKEEP,
+            weight=class_weights,
+        )
+        """
         criterion = OhemCrossEntropy(
             ignore_label=config.TRAIN.IGNORE_LABEL,
             thres=config.LOSS.OHEMTHRES,
             min_kept=config.LOSS.OHEMKEEP,
             weight=train_dataset.class_weights,
         )
+        """
     else:
-        criterion = CrossEntropy(ignore_label=config.TRAIN.IGNORE_LABEL, weight=train_dataset.class_weights)
+        print("Using standard Cross Entropy Loss and using IFW with alpha=0.5")
+        #criterion = CrossEntropy(ignore_label=config.TRAIN.IGNORE_LABEL, weight=train_dataset.class_weights)
+        class_weights = train_dataset.inverse_frequency_weighting(alpha = 0.5)
+        criterion = CrossEntropy(ignore_label=config.TRAIN.IGNORE_LABEL, weight=class_weights)
+        del class_weights
 
     model = FullModel(model, criterion)
     if distributed:
