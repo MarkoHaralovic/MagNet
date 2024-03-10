@@ -133,8 +133,11 @@ def get_uncertain_point_coords_on_grid(uncertainty_map, num_points):
     point_coords = torch.zeros(R, num_points, 2, dtype=torch.float, device=uncertainty_map.device)
 
     point_coords[:, :, 0] = w_step / 2.0 + (point_indices % W).to(torch.float) * w_step
-    point_coords[:, :, 1] = h_step / 2.0 + (point_indices // W).to(torch.float) * h_step
+    #point_coords[:, :, 1] = h_step / 2.0 + (point_indices // W).to(torch.float) * h_step
+    # Line above returned UserWarning: __floordiv__ is deprecated, and its behavior will change in a future version of pytorch. It currently rounds toward 0 (like the 'trunc' function NOT 'floor'). This results in incorrect rounding for negative values. To keep the current behavior, use torch.div(a, b, rounding_mode='trunc'), or for actual floor division, use torch.div(a, b, rounding_mode='floor').
+    point_coords[:, :, 1] = h_step / 2.0 + torch.div(point_indices, W, rounding_mode='trunc').to(torch.float) * h_step
 
+    
     # Sort indices
     sorted_values = torch.sqrt(point_coords[:, :, 0] ** 2 + point_coords[:, :, 1] ** 2)
     indices = torch.argsort(sorted_values, 1)

@@ -1,0 +1,15 @@
+python demo.py --dataset deepglobe \
+--image $1 \
+--scales 512-512,1024-1024,2048-2048  \
+--crop_size 512 512  \
+--input_size 508 508 \
+--model fpn \
+--pretrained checkpoints/deepglobe_fpn.pth \
+--pretrained_refinement checkpoints/deepglobe_refinement.pth \
+--num_classes 7 \
+--n_points 0.75 \
+--n_patches -1 \
+--sub_batch_size 1 \
+--smooth_kernel 11 \
+--save_pred \
+--save_dir test_results/vietnam_demo

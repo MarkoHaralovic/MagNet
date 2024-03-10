@@ -108,6 +108,7 @@ def main():
 
     # Loading image
     image = cv2.cvtColor(cv2.imread(opt.image, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+
     ori_H, ori_W = image.shape[0], image.shape[1]
     image_patches, scale_idx = dataset.slice_image(image)
 
