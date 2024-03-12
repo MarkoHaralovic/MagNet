@@ -1,5 +1,5 @@
-IMAGE_DIR="../rgb"
-OUTPUT_DIR="../masks"
+IMAGE_DIR="../vietnam_semseg_test/rgb"
+OUTPUT_DIR="../vietnam_semseg_test/masks"
 
 start=$(date +%s)
 

@@ -60,7 +60,8 @@ def main():
 
     sub_batch_size = opt.sub_batch_size
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cuda:2") if torch.cuda.is_available() else torch.device("cpu")
+    #print(device)
 
     # Create dataset
     dataset = get_dataset_with_name(opt.dataset)(opt)
@@ -153,10 +154,10 @@ def main():
             selected_patch_ids = selected_patch_ids[: opt.n_patches]
 
         # Filter image_patches of this scale
-        scale_image_patches = image_patches[scale_idx == idx]
+        scale_image_patches = image_patches[scale_idx == idx].to(device)
 
         # Filter image_patches with selected_patch_ids
-        scale_image_patches = scale_image_patches[selected_patch_ids]
+        scale_image_patches = scale_image_patches[selected_patch_ids].to(device)
 
         # Get early predictions
         scale_early_preds = get_batch_predictions(model, sub_batch_size, scale_image_patches.to(device))
