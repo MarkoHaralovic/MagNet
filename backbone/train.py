@@ -156,7 +156,7 @@ def main():
             drop_last=True,
             sampler=extra_train_sampler,
         )
-        extra_epoch_iters = np.int(extra_train_dataset.__len__() / config.TRAIN.BATCH_SIZE_PER_GPU / len(gpus))
+        extra_epoch_iters = np.int_(extra_train_dataset.__len__() / config.TRAIN.BATCH_SIZE_PER_GPU / len(gpus))
 
     test_size = (config.TEST.IMAGE_SIZE[1], config.TEST.IMAGE_SIZE[0])
     test_dataset = eval("datasets." + config.DATASET.DATASET)(
@@ -190,6 +190,7 @@ def main():
 
     # criterion
     if config.LOSS.USE_OHEM:
+        """
         print("Using OHEM Cross Entropy Loss and using IFW with alpha=0.25")
         class_weights = train_dataset.inverse_frequency_weighting(alpha = 0.25)
         
@@ -206,7 +207,6 @@ def main():
             min_kept=config.LOSS.OHEMKEEP,
             weight=train_dataset.class_weights,
         )
-        """
     else:
         print("Using standard Cross Entropy Loss and using IFW with alpha=0.5")
         #criterion = CrossEntropy(ignore_label=config.TRAIN.IGNORE_LABEL, weight=train_dataset.class_weights)
@@ -255,7 +255,7 @@ def main():
     else:
         raise ValueError("Only Support SGD optimizer")
 
-    epoch_iters = np.int(train_dataset.__len__() / config.TRAIN.BATCH_SIZE_PER_GPU / len(gpus))
+    epoch_iters = np.int_(train_dataset.__len__() / config.TRAIN.BATCH_SIZE_PER_GPU / len(gpus))
 
     best_mIoU = 0
     last_epoch = 0
@@ -338,7 +338,7 @@ def main():
 
         writer_dict["writer"].close()
         end = timeit.default_timer()
-        logger.info("Hours: %d" % np.int((end - start) / 3600))
+        logger.info("Hours: %d" % np.int_((end - start) / 3600))
         logger.info("Done")
 
 
